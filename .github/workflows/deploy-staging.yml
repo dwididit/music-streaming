@@ -41,8 +41,8 @@ jobs:
             # Ensure a .gitconfig exists
             touch ~/.gitconfig
             echo "[user]" >> ~/.gitconfig
-            echo "    email = your_email@example.com" >> ~/.gitconfig
-            echo "    name = Your Name" >> ~/.gitconfig
+            echo "    email = didit@dwidi.com" >> ~/.gitconfig
+            echo "    name = Dwi Didit Prasetiyo" >> ~/.gitconfig
 
             # Set environment variables in .env file
             echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
