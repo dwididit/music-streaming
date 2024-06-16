@@ -14,7 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          node-version: '20'
+          node-version: '20'  # Ensure Node.js 20 is specified
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
@@ -25,7 +30,7 @@ jobs:
           script: |
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
-              sudo docker-compose down pacmusic-stg
+              sudo /usr/local/bin/docker-compose down pacmusic-stg
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -38,7 +43,7 @@ jobs:
             echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
 
-            sudo docker-compose up --build -d pacmusic-stg
+            sudo /usr/local/bin/docker-compose up --build -d pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
