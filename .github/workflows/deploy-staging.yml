@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          node-version: '20'  # Ensure Node.js 20 is specified
+          node-version: '20'
 
       - name: Install Docker Compose
         run: |
@@ -28,14 +28,14 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_STAGING }}
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
-            if [ -d "$APP_STG_PATH" ]; then
+            if [ ! -d "$APP_STG_PATH" ]; then
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
+              git clone $GIT_URL $APP_STG_PATH
+              cd $APP_STG_PATH
+            else
               cd $APP_STG_PATH
               sudo /usr/local/bin/docker-compose down pacmusic-stg
               git pull origin main
-            else
-              ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone $GIT_URL .
-              cd $APP_STG_PATH
             fi
 
             echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
