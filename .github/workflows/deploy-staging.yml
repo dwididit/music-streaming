@@ -1,0 +1,46 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run deployment script on staging server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST_STAGING }}
+          username: ${{ secrets.SSH_USER_NAME_STAGING }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+          script: |
+            if [ -d "$APP_STG_PATH" ]; then
+              cd $APP_STG_PATH
+              sudo docker compose down pacmusic-stg
+              git pull origin main
+            else
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
+              git clone $GIT_URL $APP_STG_PATH
+              cd $APP_STG_PATH
+            fi
+
+            echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+            echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
+            echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
+            echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+
+            sudo docker compose up --build --detach pacmusic-stg
+
+      - name: Wait for the application to start
+        run: sleep 10
+
+      - name: Test Hit Endpoint
+        run: |
+          curl -f ${{ secrets.STG_URL }}
