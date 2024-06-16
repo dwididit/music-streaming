@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          node-version: '20'  # Ensure Node.js 20 is specified
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
