@@ -1,4 +1,4 @@
-name: Push to Container Registry
+name: Push to Container Registry 🛒
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
       - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./app
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:${{ github.ref_name }}
