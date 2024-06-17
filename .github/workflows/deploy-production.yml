@@ -40,6 +40,10 @@ jobs:
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
             echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+            echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
+            echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
+
+            cat .env  # Print the .env file to debug if variables are being set correctly
 
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
