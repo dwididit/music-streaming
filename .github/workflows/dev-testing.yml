@@ -1,7 +1,7 @@
 name: Dev Testing 🔎
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
