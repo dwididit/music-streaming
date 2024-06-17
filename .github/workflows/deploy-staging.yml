@@ -33,7 +33,7 @@ jobs:
 
       - name: Ensure SSH key is set up correctly
         run: |
-          ssh -o StrictHostKeyChecking=no -T git@github.com || exit 1
+          ssh -i keyfile -o StrictHostKeyChecking=no ubuntu@108.136.118.235 exit 0
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
