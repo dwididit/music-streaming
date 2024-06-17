@@ -16,12 +16,12 @@ jobs:
 
       - name: Create .env file for dev
         run: |
-          echo "MINIO_DEV_ENDPOINT=api-dev.minio-devops-class.pacmann.ai" > .env
-          echo "MINIO_DEV_ACCESS_KEY=pgxr3lnKHj4mxI7f69y9" >> .env
-          echo "MINIO_DEV_SECRET_KEY=KBy9zfXscFDsbI5FWKJEWUPz6VpefDXagioj6rtF" >> .env
+          echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
+          echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
+          echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
 
       - name: Build and Run application
-        run: sudo docker-compose up --build --detach pacmusic-dev
+        run: sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
       - name: Test Hit Endpoint
         run: |
