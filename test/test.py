@@ -19,29 +19,29 @@ class TestMusicPlayer(unittest.TestCase):
 
     def test_play_song(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick=\"playAudio(this.parentElement.getAttribute('data-url'), this.parentElement)\"]"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick=\"playAudio(this.parentElement.getAttribute('data-url'), this.parentElement)\"]"))
         ).click()
 
     def test_play_pause(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='togglePlayPause()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='togglePlayPause()']"))
         ).click()
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='togglePlayPause()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='togglePlayPause()']"))
         ).click()
 
     def test_next_previous_song(self):
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='nextSong()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='nextSong()']"))
         ).click()
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='nextSong()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='nextSong()']"))
         ).click()
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='previousSong()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='previousSong()']"))
         ).click()
         WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//button[@onclick='previousSong()']"))
+            EC.element_to_be_clickable((By.XPATH, "//button[@onclick='previousSong()']"))
         ).click()
 
     def tearDown(self):
