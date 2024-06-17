@@ -54,6 +54,9 @@ jobs:
 
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
+      - name: Get Docker logs
+        run: docker logs pacmusic-prod
+
       - name: Wait for the application to start
         run: sleep 10
 
