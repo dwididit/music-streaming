@@ -27,13 +27,12 @@ jobs:
       - name: Add SSH key to the agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+          ssh-private-key: |
+            ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
       - name: Ensure SSH key is set up correctly
         run: |
-          ssh -o StrictHostKeyChecking=no -T git@github.com
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+          ssh -o StrictHostKeyChecking=no -T git@github.com || exit 1
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
