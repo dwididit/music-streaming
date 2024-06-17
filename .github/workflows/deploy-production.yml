@@ -22,11 +22,25 @@ jobs:
         run: |
           mkdir -p app
           if [ -f "requirements.txt" ]; then
-            cp requirements.txt app/requirements.txt
+            cp requirements.txt app/
           fi
           if [ -f "app.py" ]; then
-            cp app.py app/app.py
+            cp app.py app/
           fi
+
+      - name: Build Docker image
+        run: docker build -t pacmusic-prod:latest -f app/Dockerfile app
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker tag pacmusic-prod:latest ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest
 
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
@@ -50,9 +64,8 @@ jobs:
             echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-            echo "APP_IMAGE=dwididitp/pacmusic" >> .env
+            echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=latest" >> .env
-            sudo docker-compose --env-file .env pull pacmusic-prod
             sudo docker-compose --env-file .env up --detach pacmusic-prod
 
       - name: Wait for the application to start
