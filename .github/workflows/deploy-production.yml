@@ -43,8 +43,8 @@ jobs:
             echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
             echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
 
-            cat .env  # Print the .env file to debug if variables are being set correctly
-
+            cat .env
+            
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
