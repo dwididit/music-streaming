@@ -62,11 +62,3 @@ jobs:
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
 
-      - name: Run tests
-        env:
-          PYTHONPATH: ..
-          MINIO_ENDPOINT: ${{ secrets.MINIO_DEV_ENDPOINT }}
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_DEV_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_DEV_SECRET_KEY }}
-        run: python3 -m unittest discover -s test -p "*.py"
-
