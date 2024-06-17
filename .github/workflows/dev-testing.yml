@@ -43,17 +43,13 @@ jobs:
       - name: Move requirements.txt if necessary
         run: |
           if [ -f "app/requirements.txt" ]; then
-            mv app/requirements.txt requirements.txt
+            cp app/requirements.txt requirements.txt
           fi
 
       - name: Build and Run application
         run: |
           cat .env
-          sudo docker-compose --env-file .env up --build --detach pacmusic-dev || true
-          if [ -f "requirements.txt" ]; then
-            docker-compose exec pacmusic-dev pip install -r requirements.txt
-          fi
-          docker-compose exec pacmusic-dev python3 app.py
+          sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
       - name: Test Hit Endpoint
         run: |
