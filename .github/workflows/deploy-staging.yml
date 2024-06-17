@@ -47,26 +47,34 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             APP_STG_PATH="/home/ubuntu/staging"
+            echo "APP_STG_PATH: $APP_STG_PATH"
+            echo "Checking if directory exists..."
             if [ ! -d "$APP_STG_PATH" ]; then
+              echo "Directory does not exist. Cloning repository..."
               ssh-keyscan github.com >> ~/.ssh/known_hosts
               git clone git@github.com:dwididit/music-streaming.git $APP_STG_PATH
             else
+              echo "Directory exists. Pulling latest changes..."
               cd $APP_STG_PATH
-              sudo docker-compose -f ../docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
               git pull origin main
             fi
             cd $APP_STG_PATH
-
-            if [ ! -f "../docker-compose.yaml" ]; then
-              echo "Error: ../docker-compose.yaml not found in $(pwd)"
+            echo "Current directory: $(pwd)"
+            echo "Directory listing: $(ls -al)"
+            echo "Ensuring docker-compose.yaml exists..."
+            if [ ! -f "docker-compose.yaml" ]; then
+              echo "Error: docker-compose.yaml not found in $(pwd)"
               exit 1
             fi
 
+            # Ensure a .gitconfig exists
             touch ~/.gitconfig
             echo "[user]" >> ~/.gitconfig
             echo "    email = didit@dwidi.com" >> ~/.gitconfig
             echo "    name = Dwi Didit Prasetiyo" >> ~/.gitconfig
 
+            # Create the .env file with the environment variables
             cat <<EOT > .env
             MINIO_DEV_ENDPOINT=api-dev.minio-devops-class.pacmann.ai
             MINIO_DEV_ACCESS_KEY=pgxr3lnKHj4mxI7f69y9
@@ -83,10 +91,10 @@ jobs:
             APP_PROD_PORT=5000
             EOT
 
-            sudo docker-compose -f ../docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
+            sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
             git pull origin main
 
-            sudo docker-compose -f ../docker-compose.yaml up --build -d pacmusic-stg
+            sudo docker-compose -f docker-compose.yaml up --build -d pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
