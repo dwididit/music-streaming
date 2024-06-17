@@ -62,9 +62,9 @@ jobs:
             cd $APP_STG_PATH
             echo "Current directory: $(pwd)"
             echo "Directory listing: $(ls -al)"
-            echo "Ensuring docker-compose.yml exists..."
-            if [ ! -f "docker-compose.yml" ]; then
-              echo "Error: docker-compose.yml not found in $(pwd)"
+            echo "Ensuring docker-compose.yaml exists..."
+            if [ ! -f "docker-compose.yaml" ]; then
+              echo "Error: docker-compose.yaml not found in $(pwd)"
               exit 1
             fi
 
@@ -83,7 +83,7 @@ jobs:
             echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
 
-            sudo docker-compose up --build -d pacmusic-stg
+            sudo docker-compose -f docker-compose.yaml up --build -d pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
