@@ -32,6 +32,8 @@ jobs:
           chmod 600 keyfile
           eval "$(ssh-agent -s)"
           ssh-add keyfile
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Ensure SSH key is set up correctly
         run: |
