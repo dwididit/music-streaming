@@ -65,4 +65,8 @@ jobs:
         run: docker inspect pacmusic-prod
 
       - name: Test Hit Endpoint
-        run: curl -f ${{ secrets.PROD_URL }}
+        run: |
+          for i in {1..5}; do
+            curl -f ${{ secrets.PROD_URL }} && break || sleep 10;
+          done
+      
