@@ -44,4 +44,6 @@ services:
 
 networks:
   pacmusic-network:
+    driver: bridge
+    name: pacmusic-network
     external: true
