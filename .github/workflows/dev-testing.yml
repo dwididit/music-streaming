@@ -21,7 +21,9 @@ jobs:
           echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
 
       - name: Build and Run application
-        run: sudo docker-compose --env-file .env up --build --detach pacmusic-dev
+        run: |
+          cat .env
+          sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
       - name: Test Hit Endpoint
         run: |
