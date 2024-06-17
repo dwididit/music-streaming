@@ -1,4 +1,4 @@
-name: Deploy Production
+name: Deploy Production 🚀
 
 on:
   release:
@@ -13,6 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
+
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
         with:
@@ -20,28 +25,27 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_PRODUCTION }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
           script: |
+            APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker compose down pacmusic-prod
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone $GIT_URL $APP_PROD_PATH
+              git clone ${{ secrets.GIT_URL }} $APP_PROD_PATH
               cd $APP_PROD_PATH
             fi
-
+            touch .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
-            echo "APP_TAG=${{ github.ref_name }}" >> .env
+            echo "APP_TAG=${GITHUB_REF##*/}" >> .env
             echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
             echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-
-            sudo docker compose up --build --detach pacmusic-prod
+            sudo docker-compose up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 10
 
       - name: Test Hit Endpoint
-        run: |
-          curl -f ${{ secrets.PROD_URL }}
+        run: curl -f ${{ secrets.PROD_URL }}

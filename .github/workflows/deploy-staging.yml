@@ -1,4 +1,4 @@
-name: Deploy Staging
+name: Deploy Staging 🚀
 
 on:
   push:
@@ -11,33 +11,13 @@ jobs:
     environment: staging
 
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          node-version: '20'
-
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-
-      - name: Add SSH key to the agent
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > keyfile
-          chmod 600 keyfile
-          eval "$(ssh-agent -s)"
-          ssh-add keyfile
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Ensure SSH key is set up correctly
-        run: |
-          ssh -i keyfile -o StrictHostKeyChecking=no ubuntu@${{ secrets.SSH_HOST_STAGING }} exit 0
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
@@ -47,57 +27,24 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             APP_STG_PATH="/home/ubuntu/staging"
-            REPO_PATH="/home/ubuntu/music-streaming"
-            if [ ! -d "$REPO_PATH" ]; then
-              ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone git@github.com:dwididit/music-streaming.git $REPO_PATH
-            else
-              cd $REPO_PATH
-              sudo docker-compose -f /home/ubuntu/music-streaming/docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
+            if [ -d "$APP_STG_PATH" ]; then
+              cd $APP_STG_PATH
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
               git pull origin main
+            else
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
+              git clone ${{ secrets.GIT_URL }} $APP_STG_PATH
+              cd $APP_STG_PATH
             fi
-            cd $REPO_PATH
-
-            if [ ! -f "/home/ubuntu/music-streaming/docker-compose.yaml" ]; then
-              echo "Error: /home/ubuntu/music-streaming/docker-compose.yaml not found"
-              exit 1
-            fi
-
-            touch ~/.gitconfig
-            echo "[user]" >> ~/.gitconfig
-            echo "    email = didit@dwidi.com" >> ~/.gitconfig
-            echo "    name = Dwi Didit Prasetiyo" >> ~/.gitconfig
-
-            cat <<EOT > .env
-            MINIO_DEV_ENDPOINT=api-dev.minio-devops-class.pacmann.ai
-            MINIO_DEV_ACCESS_KEY=pgxr3lnKHj4mxI7f69y9
-            MINIO_DEV_SECRET_KEY=KBy9zfXscFDsbI5FWKJEWUPz6VpefDXagioj6rtF
-
-            MINIO_STG_ENDPOINT=api-stg.minio-devops-class.pacmann.ai
-            MINIO_STG_ACCESS_KEY=L8TO4LudnGJyMCWQ4F6Y
-            MINIO_STG_SECRET_KEY=qGcII3Qb2cAUJTYhsoKztY4NE2wNV0GTdkn3zKLJ
-            APP_STG_PORT=5001
-
-            MINIO_PROD_ENDPOINT=api-prod.minio-devops-class.pacmann.ai
-            MINIO_PROD_ACCESS_KEY=1EApWjUnu7YPW8XGU9K8
-            MINIO_PROD_SECRET_KEY=yS9awRgYZ0zJAq69fwlYhZSYj5ypzoCB3Z2oLlOF
-            APP_PROD_PORT=5000
-            EOT
-
-            # Stop and remove any existing container with the name "pacmusic-stg"
-            if [ $(sudo docker ps -a -q -f name=pacmusic-stg) ]; then
-              sudo docker stop pacmusic-stg
-              sudo docker rm pacmusic-stg
-            fi
-
-            sudo docker-compose -f /home/ubuntu/music-streaming/docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
-            git pull origin main
-
-            sudo docker-compose -f /home/ubuntu/music-streaming/docker-compose.yaml up --build -d pacmusic-stg
+            touch .env
+            echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+            echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
+            echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
+            echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+            sudo docker-compose up --build --detach pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
 
       - name: Test Hit Endpoint
-        run: |
-          curl -f ${{ secrets.STG_URL }}
+        run: curl -f ${{ secrets.STG_URL }}

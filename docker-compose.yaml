@@ -12,7 +12,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_DEV_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_DEV_SECRET_KEY}
     ports:
-      - 5000:5000
+      - "5000:5000"
     networks:
       - pacmusic-network
 
@@ -27,7 +27,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_STG_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STG_SECRET_KEY}
     ports:
-      - ${APP_STG_PORT}:5000
+      - "${APP_STG_PORT}:5000"
     networks:
       - pacmusic-network
 
@@ -40,7 +40,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_PROD_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_PROD_SECRET_KEY}
     ports:
-      - ${APP_PROD_PORT}:5000
+      - "${APP_PROD_PORT}:5000"
     networks:
       - pacmusic-network
 
@@ -48,8 +48,3 @@ networks:
   pacmusic-network:
     driver: bridge
     name: pacmusic-network
-
-volumes:
-  minio-dev-vol:
-    driver: local
-    name: minio-dev-vol
