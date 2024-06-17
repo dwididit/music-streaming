@@ -46,11 +46,16 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_STAGING }}
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
+            # Debugging information
+            echo "APP_STG_PATH: $APP_STG_PATH"
+            echo "Checking if directory exists..."
             if [ ! -d "$APP_STG_PATH" ]; then
+              echo "Directory does not exist. Cloning repository..."
               ssh-keyscan github.com >> ~/.ssh/known_hosts
               git clone git@github.com:dwididit/music-streaming.git $APP_STG_PATH
               cd $APP_STG_PATH
             else
+              echo "Directory exists. Pulling latest changes..."
               cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
               git pull origin main
@@ -67,6 +72,12 @@ jobs:
             echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
             echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+
+            # Ensure docker-compose.yml exists
+            if [ ! -f "docker-compose.yml" ]; then
+              echo "Error: docker-compose.yml not found in $APP_STG_PATH"
+              exit 1
+            fi
 
             # Build and start Docker containers
             sudo docker-compose up --build -d pacmusic-stg
