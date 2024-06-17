@@ -19,10 +19,18 @@ jobs:
           echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
           echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
           echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
+          echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
+          echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
+          echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+          echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+          echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
+          echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
+          echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
+          echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
 
       - name: Build and Run application
         run: |
-          cat .env
+          cat .env  # Ensure .env file is correct
           sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
       - name: Test Hit Endpoint
