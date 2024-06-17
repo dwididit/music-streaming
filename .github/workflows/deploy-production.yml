@@ -24,14 +24,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Pull Docker image
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest
-
-      - name: Build Docker image and list contents of /app
-        run: |
-          docker build -t pacmusic-temp:latest .
-          docker run --rm pacmusic-temp:latest ls /app
-
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
         with:
@@ -54,9 +46,12 @@ jobs:
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
             echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+            echo "APP_IMAGE=dwididitp/pacmusic" >> .env
+            echo "APP_TAG=latest" >> .env
 
             cat .env
 
+            sudo docker-compose --env-file .env pull pacmusic-prod
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
