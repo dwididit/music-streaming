@@ -12,7 +12,7 @@ import threading
 class TestMusicPlayer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5002, 'debug': True})
+        cls.server = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5000, 'debug': True})
         cls.server.start()
         cls.chrome_options = Options()
         cls.chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
