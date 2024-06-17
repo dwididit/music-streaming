@@ -53,13 +53,13 @@ jobs:
               git clone git@github.com:dwididit/music-streaming.git $REPO_PATH
             else
               cd $REPO_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
+              sudo docker-compose -f /home/ubuntu/docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
               git pull origin main
             fi
             cd $REPO_PATH
 
-            if [ ! -f "docker-compose.yaml" ]; then
-              echo "Error: docker-compose.yaml not found in $(pwd)"
+            if [ ! -f "/home/ubuntu/docker-compose.yaml" ]; then
+              echo "Error: /home/ubuntu/docker-compose.yaml not found"
               exit 1
             fi
 
@@ -90,10 +90,10 @@ jobs:
               sudo docker rm pacmusic-stg
             fi
 
-            sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
+            sudo docker-compose -f /home/ubuntu/docker-compose.yaml down --remove-orphans --timeout 60 pacmusic-stg || true
             git pull origin main
 
-            sudo docker-compose up --build -d pacmusic-stg
+            sudo docker-compose -f /home/ubuntu/docker-compose.yaml up --build -d pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
