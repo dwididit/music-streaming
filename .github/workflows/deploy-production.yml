@@ -37,7 +37,7 @@ jobs:
             APP_PROD_PATH="${{ secrets.APP_PROD_PATH }}"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
+              sudo docker-compose down --remove-orphans --timeout 60 || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -52,13 +52,15 @@ jobs:
 
             cat .env
 
-            sudo docker-compose --env-file .env up --build --detach pacmusic-prod
-
-      - name: Get Docker logs
-        run: docker logs pacmusic-prod
+            sudo docker-compose --env-file .env up --build --detach
 
       - name: Wait for the application to start
         run: sleep 30
+
+      - name: Get Docker logs
+        run: |
+          sudo docker ps -a
+          sudo docker logs pacmusic-prod
 
       - name: Test Hit Endpoint
         run: curl -f ${{ secrets.PROD_URL }}
