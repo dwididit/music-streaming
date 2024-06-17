@@ -11,9 +11,11 @@ jobs:
     environment: dev-testing
 
     steps:
+      # Step to checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Step to create the .env file using GitHub secrets
       - name: Create .env file for dev
         run: |
           echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
@@ -30,18 +32,21 @@ jobs:
           echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
           echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
 
+      # Step to build and run the application using docker-compose
       - name: Build and Run application
         run: |
           cat .env
           sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
+      # Step to test if the application is running correctly
       - name: Test Hit Endpoint
         run: |
-          sleep 10
-          curl http://localhost:5000
+          sleep 10  # Wait for the application to start
+          curl http://localhost:5000  # Test the application endpoint
 
+      # Step to install the testing requirements
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
 
-      - name: Run tests
+      # Step to run the tests
         run: python3 test/test.py
