@@ -19,11 +19,10 @@ jobs:
           echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
           echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
           echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
+          cat .env  # Print .env file content to ensure it is correct
 
       - name: Build and Run application
-        run: |
-          cat .env
-          sudo docker-compose --env-file .env up --build --detach pacmusic-dev
+        run: sudo docker-compose --env-file .env up --build --detach pacmusic-dev
 
       - name: Test Hit Endpoint
         run: |
