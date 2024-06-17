@@ -21,11 +21,11 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull Docker image
-        run: docker pull dwididitp/pacmusic:latest
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest
 
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
@@ -54,19 +54,11 @@ jobs:
 
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
-      - name: Wait for the application to start
-        run: sleep 30
-
       - name: Get Docker logs
-        run: |
-          docker logs pacmusic-prod
+        run: docker logs pacmusic-prod
 
-      - name: Inspect Docker container for production
-        run: docker inspect pacmusic-prod
+      - name: Wait for the application to start
+        run: sleep 10
 
       - name: Test Hit Endpoint
-        run: |
-          for i in {1..5}; do
-            curl -f ${{ secrets.PROD_URL }} && break || sleep 10;
-          done
-      
+        run: curl -f ${{ secrets.PROD_URL }}
