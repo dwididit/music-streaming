@@ -12,7 +12,7 @@ import threading
 class TestMusicPlayer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5001, 'debug': True})
+        cls.server = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5002, 'debug': True})
         cls.server.start()
         cls.chrome_options = Options()
         cls.chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
@@ -21,7 +21,7 @@ class TestMusicPlayer(unittest.TestCase):
 
     def setUp(self):
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.chrome_options)
-        self.driver.get("http://localhost:5001")
+        self.driver.get("http://localhost:5002")
         self.driver.implicitly_wait(30)
 
     def test_play_song(self):
