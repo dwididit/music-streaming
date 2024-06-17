@@ -39,7 +39,11 @@ jobs:
       - name: Build and Run application
         run: |
           cat .env
-          sudo docker-compose --env-file .env up --build --detach pacmusic-dev
+          sudo docker-compose --env-file .env up --build --detach pacmusic-dev || true
+          if [ -f "requirements.txt" ]; then
+            docker-compose exec pacmusic-dev pip install -r requirements.txt
+          fi
+          docker-compose exec pacmusic-dev python3 app.py
 
       - name: Test Hit Endpoint
         run: |
@@ -48,3 +52,6 @@ jobs:
 
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
+
+      - name: Run tests
+        run: python3 test/test.py
