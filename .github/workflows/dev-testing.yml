@@ -29,13 +29,18 @@ jobs:
       - name: Create .env file
         run: |
           cat <<EOT > .env
-          MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}
-          MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}
-          MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}
+          MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}
+          MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}
+          MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}
           APP_STG_PORT=5001
           EOT
 
       - name: Build and Run application
+        env:
+          MINIO_STG_ENDPOINT: ${{ secrets.MINIO_STG_ENDPOINT }}
+          MINIO_STG_ACCESS_KEY: ${{ secrets.MINIO_STG_ACCESS_KEY }}
+          MINIO_STG_SECRET_KEY: ${{ secrets.MINIO_STG_SECRET_KEY }}
+          APP_STG_PORT: 5001
         run: sudo docker-compose up --build --detach pacmusic-stg
 
       - name: Test Hit Endpoint
