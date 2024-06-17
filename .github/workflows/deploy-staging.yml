@@ -25,15 +25,17 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
 
       - name: Add SSH key to the agent
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY_STAGING }}" > keyfile
+          echo "$SSH_PRIVATE_KEY" > keyfile
           chmod 600 keyfile
-          eval $(ssh-agent -s)
+          eval "$(ssh-agent -s)"
           ssh-add keyfile
 
       - name: Ensure SSH key is set up correctly
         run: |
-          ssh -i keyfile -o StrictHostKeyChecking=no ubuntu@108.136.118.235 exit 0
+          ssh -i keyfile -o StrictHostKeyChecking=no ubuntu@${{ secrets.SSH_HOST_STAGING }} exit 0
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
