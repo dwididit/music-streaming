@@ -51,9 +51,8 @@ jobs:
           cat .env
           sudo docker-compose --env-file .env up --build --detach pacmusic-dev
           if [ -f "requirements.txt" ]; then
-            docker-compose exec pacmusic-dev pip install -r requirements.txt
+            docker-compose exec -T pacmusic-dev pip install -r requirements.txt
           fi
-          docker-compose exec pacmusic-dev python3 app.py
 
       - name: Test Hit Endpoint
         run: |
