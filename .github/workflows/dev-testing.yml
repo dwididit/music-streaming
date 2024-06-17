@@ -64,10 +64,8 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONPATH: ./app
+          PYTHONPATH: ./app  # Add the app directory to PYTHONPATH
           MINIO_ENDPOINT: ${{ secrets.MINIO_DEV_ENDPOINT }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_DEV_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_DEV_SECRET_KEY }}
-        run: |
-          lsof -i :5000 | awk 'NR>1 {print $2}' | xargs kill -9 || true
-          python3 test/test.py
+        run: python3 test/test.py
