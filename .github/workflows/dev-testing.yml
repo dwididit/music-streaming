@@ -30,6 +30,12 @@ jobs:
           echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
           echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
 
+      - name: Move requirements.txt if necessary
+        run: |
+          if [ -f "app/requirements.txt" ]; then
+            mv app/requirements.txt requirements.txt
+          fi
+
       - name: Build and Run application
         run: |
           cat .env
@@ -42,4 +48,3 @@ jobs:
 
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
-
