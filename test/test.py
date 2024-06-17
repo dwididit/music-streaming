@@ -21,7 +21,7 @@ class TestMusicPlayer(unittest.TestCase):
 
     def setUp(self):
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.chrome_options)
-        self.driver.get("http://localhost:5002")
+        self.driver.get("http://localhost:5000")
         self.driver.implicitly_wait(30)
 
     def test_play_song(self):
