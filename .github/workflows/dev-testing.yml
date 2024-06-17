@@ -56,7 +56,7 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          sleep 10
+          sleep 20
           curl http://localhost:5002
 
       - name: Install testing requirements
