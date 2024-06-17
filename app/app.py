@@ -3,6 +3,10 @@ from minio import Minio
 from minio.error import S3Error
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
