@@ -8,8 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-from app import app, minioClient
-from minio.error import S3Error
+from app import app
 
 class TestMusicPlayer(unittest.TestCase):
     @classmethod
