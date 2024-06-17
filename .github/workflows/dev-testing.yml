@@ -64,8 +64,9 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONPATH: ./app  # Add the app directory to PYTHONPATH
+          PYTHONPATH: ./app
           MINIO_ENDPOINT: ${{ secrets.MINIO_DEV_ENDPOINT }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_DEV_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_DEV_SECRET_KEY }}
-        run: python3 test/test.py
+        run: |
+          python3 -m unittest test/test.py
