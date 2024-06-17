@@ -11,6 +11,9 @@ jobs:
     environment: staging
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -20,6 +23,17 @@ jobs:
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Add SSH key to the agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+
+      - name: Ensure SSH key is set up correctly
+        run: |
+          ssh -o StrictHostKeyChecking=no -T git@github.com
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
