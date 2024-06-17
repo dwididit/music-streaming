@@ -14,21 +14,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
       - name: Create .env file
-        run: | 
+        run: |
           cat <<EOT > .env
-          MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}
-          MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}
-          MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}
+          MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}
+          MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}
+          MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}
+          APP_STG_PORT=5001
           EOT
 
-      - name: Run application
-        run: sudo docker-compose up --build --detach pacmusic-dev
+      - name: Build and Run application
+        run: sudo docker-compose up --build --detach pacmusic-stg
 
       - name: Test Hit Endpoint
-        run: |  
+        run: |
           sleep 10
-          curl http://localhost:5000
+          curl http://localhost:5001
 
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
