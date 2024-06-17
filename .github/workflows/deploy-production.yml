@@ -13,20 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Add SSH key to the agent
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > keyfile
-          chmod 600 keyfile
-          eval "$(ssh-agent -s)"
-          ssh-add keyfile
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Ensure SSH key is set up correctly
-        run: |
-          ssh -i keyfile -o StrictHostKeyChecking=no ubuntu@${{ secrets.SSH_HOST_PRODUCTION }} exit 0
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
 
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
@@ -36,51 +26,26 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
           script: |
             APP_PROD_PATH="/home/ubuntu/production"
-            echo "APP_PROD_PATH: $APP_PROD_PATH"
-            echo "Checking if directory exists..."
-            if [ ! -d "$APP_PROD_PATH" ]; then
-              echo "Directory does not exist. Cloning repository..."
-              ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone git@github.com:dwididit/music-streaming.git $APP_PROD_PATH
-            else
-              echo "Directory exists. Pulling latest changes..."
+            if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
               sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
               git pull origin main
+            else
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
+              git clone ${{ secrets.GIT_URL }} $APP_PROD_PATH
+              cd $APP_PROD_PATH
             fi
-            cd $APP_PROD_PATH
-            echo "Current directory: $(pwd)"
-            echo "Directory listing: $(ls -al)"
-            echo "Ensuring docker-compose.yaml exists..."
-            if [ ! -f "docker-compose.yaml" ]; then
-              echo "Error: docker-compose.yaml not found in $(pwd)"
-              exit 1
-            fi
-
-            # Ensure a .gitconfig exists
-            touch ~/.gitconfig
-            echo "[user]" >> ~/.gitconfig
-            echo "    email = didit@dwidi.com" >> ~/.gitconfig
-            echo "    name = Dwi Didit Prasetiyo" >> ~/.gitconfig
-
-            # Create the .env file with the environment variables
-            cat <<EOT > .env
-            APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic
-            APP_TAG=${{ github.event.release.tag_name }}
-            MINIO_PROD_ENDPOINT=api-prod.minio-devops-class.pacmann.ai
-            MINIO_PROD_ACCESS_KEY=1EApWjUnu7YPW8XGU9K8
-            MINIO_PROD_SECRET_KEY=yS9awRgYZ0zJAq69fwlYhZSYj5ypzoCB3Z2oLlOF
-            APP_PROD_PORT=5000
-            EOT
-
-            sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
-            git pull origin main
-
+            touch .env
+            echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
+            echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
+            echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
+            echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+            echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
+            echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 10
 
       - name: Test Hit Endpoint
-        run: |
-          curl -f ${{ secrets.PROD_URL }}
+        run: curl -f ${{ secrets.PROD_URL }}
