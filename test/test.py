@@ -36,11 +36,9 @@ class TestMusicPlayer(unittest.TestCase):
 
     def test_index(self):
         self.driver.get("http://localhost:5000")
-
         try:
             # Check if the page contains the music files
             self.assertTrue(WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//audio"))))
-
         except S3Error as exc:
             print("Error occurred.", exc)
             self.fail("S3Error occurred")
