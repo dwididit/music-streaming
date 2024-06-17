@@ -29,11 +29,6 @@ def index():
         print("Error occurred.", exc)
         return "Error in fetching music files", 500
 
-
-@app.route('/docker-compose.yaml')
-def prevent_serving_docker_compose():
-    return "Access Denied", 404
-
 if __name__ == '__main__':
     app.run(debug = True, 
             host = '0.0.0.0', 
