@@ -27,6 +27,11 @@ jobs:
       - name: Pull Docker image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest
 
+      - name: Build Docker image and list contents of /app
+        run: |
+          docker build -t pacmusic-temp:latest .
+          docker run --rm pacmusic-temp:latest ls /app
+
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
         with:
