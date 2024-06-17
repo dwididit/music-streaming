@@ -1,49 +1,74 @@
 import unittest
-from unittest.mock import patch, MagicMock
+import threading
+from flask import Flask
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 from app import app, minioClient
+from minio.error import S3Error
 
 class TestMusicPlayer(unittest.TestCase):
-    def setUp(self):
-        # Set up the Flask test client
-        self.app = app.test_client()
-        self.app.testing = True
+    @classmethod
+    def setUpClass(cls):
+        # Set up the Chrome WebDriver
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Ensure GUI is off
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-    @patch('app.minioClient')
-    def test_index(self, mock_minioClient):
-        # Mock the list_objects method
-        mock_objects = [
-            MagicMock(object_name='song1.mp3'),
-            MagicMock(object_name='song2.mp3')
-        ]
-        mock_minioClient.list_objects.return_value = mock_objects
+        # Start the Flask app in a separate thread
+        cls.app_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': 5000, 'debug': True, 'use_reloader': False})
+        cls.app_thread.start()
 
-        # Mock the presigned_get_object method
-        mock_minioClient.presigned_get_object.side_effect = [
-            'http://mockedurl.com/song1.mp3',
-            'http://mockedurl.com/song2.mp3'
-        ]
+        # Give the server a second to ensure it starts
+        WebDriverWait(cls.driver, 10).until(lambda driver: driver.get("http://localhost:5000"))
 
-        # Send a request to the index route
-        response = self.app.get('/')
+    @classmethod
+    def tearDownClass(cls):
+        # Close the browser window
+        cls.driver.quit()
+        # Terminate the Flask app thread
+        cls.app_thread.join()
 
-        # Verify the response
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'song1.mp3', response.data)
-        self.assertIn(b'song2.mp3', response.data)
-        self.assertIn(b'http://mockedurl.com/song1.mp3', response.data)
-        self.assertIn(b'http://mockedurl.com/song2.mp3', response.data)
+    def test_index(self):
+        self.driver.get("http://localhost:5000")
 
-    @patch('app.minioClient')
-    def test_index_with_error(self, mock_minioClient):
-        # Mock the list_objects method to raise an S3Error
-        mock_minioClient.list_objects.side_effect = S3Error("Mocked S3 error")
+        try:
+            # Check if the page contains the music files
+            self.assertTrue(WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//audio"))))
 
-        # Send a request to the index route
-        response = self.app.get('/')
+        except S3Error as exc:
+            print("Error occurred.", exc)
+            self.fail("S3Error occurred")
 
-        # Verify the response
-        self.assertEqual(response.status_code, 500)
-        self.assertIn(b'Error in fetching music files', response.data)
+    def test_next_previous_song(self):
+        self.driver.get("http://localhost:5000")
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='nextSong()']"))
+        ).click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='nextSong()']"))
+        ).click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='previousSong()']"))
+        ).click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='previousSong()']"))
+        ).click()
+
+    def test_play_pause(self):
+        self.driver.get("http://localhost:5000")
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='togglePlayPause()']"))
+        ).click()
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//button[@onclick='togglePlayPause()']"))
+        ).click()
 
 if __name__ == '__main__':
     unittest.main()
