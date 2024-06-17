@@ -54,11 +54,15 @@ jobs:
 
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
-      - name: Get Docker logs
-        run: docker logs pacmusic-prod
-
       - name: Wait for the application to start
-        run: sleep 10
+        run: sleep 30
+
+      - name: Get Docker logs
+        run: |
+          docker logs pacmusic-prod
+
+      - name: Inspect Docker container for production
+        run: docker inspect pacmusic-prod
 
       - name: Test Hit Endpoint
         run: curl -f ${{ secrets.PROD_URL }}
