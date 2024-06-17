@@ -25,10 +25,11 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
 
       - name: Add SSH key to the agent
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: |
-            ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY_STAGING }}" > keyfile
+          chmod 600 keyfile
+          eval $(ssh-agent -s)
+          ssh-add keyfile
 
       - name: Ensure SSH key is set up correctly
         run: |
