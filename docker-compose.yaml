@@ -33,7 +33,7 @@ services:
 
   # PROD
   pacmusic-prod:
-    image: "pacmusic:latest"
+    image: "dwididitp/pacmusic:latest"
     container_name: pacmusic-prod
     environment:
       MINIO_ENDPOINT: ${MINIO_PROD_ENDPOINT}
