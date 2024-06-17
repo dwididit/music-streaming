@@ -25,7 +25,7 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_PRODUCTION }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
           script: |
-            APP_PROD_PATH="/home/ubuntu/production"
+            APP_PROD_PATH="${{ secrets.APP_PROD_PATH }}"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
               sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
@@ -40,8 +40,7 @@ jobs:
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
             echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
-            echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
-            echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
+
             sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
