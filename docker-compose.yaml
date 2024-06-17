@@ -33,6 +33,7 @@ services:
   pacmusic-prod:
     image: "dwididitp/pacmusic:latest"
     container_name: pacmusic-prod
+    platform: linux/amd64
     environment:
       MINIO_ENDPOINT: ${MINIO_PROD_ENDPOINT}
       MINIO_ACCESS_KEY: ${MINIO_PROD_ACCESS_KEY}
