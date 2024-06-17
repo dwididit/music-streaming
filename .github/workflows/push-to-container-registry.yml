@@ -25,4 +25,4 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           TAG=${GITHUB_REF##*/}
-          docker buildx build --push --file app/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:${TAG} --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest .
+          docker buildx build --push --file ./app/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:${TAG} --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest .
