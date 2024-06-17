@@ -18,11 +18,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Move requirements.txt if necessary
+        run: |
+          if [ -f "app/requirements.txt" ]; then
+            mv app/requirements.txt requirements.txt
+          fi
 
       - name: Run deployment script on production server
         uses: appleboy/ssh-action@master
@@ -31,10 +31,10 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_PRODUCTION }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
           script: |
-            APP_PROD_PATH="${{ secrets.APP_PROD_PATH }}"
+            APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 || true
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -42,25 +42,16 @@ jobs:
               cd $APP_PROD_PATH
             fi
             touch .env
+            echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
             echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
             echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
             echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-            echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
             echo "APP_IMAGE=dwididitp/pacmusic" >> .env
             echo "APP_TAG=latest" >> .env
-
-            cat .env
-
-            sudo docker-compose --env-file .env pull pacmusic-prod
-            sudo docker-compose --env-file .env up --detach pacmusic-prod
+            sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 30
-
-      - name: Get Docker logs
-        run: |
-          sudo docker ps -a
-          sudo docker logs pacmusic-prod
 
       - name: Test Hit Endpoint
         run: curl -f ${{ secrets.PROD_URL }}
