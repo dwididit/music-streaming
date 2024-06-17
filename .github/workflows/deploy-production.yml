@@ -52,7 +52,7 @@ jobs:
 
             cat .env
 
-            sudo docker-compose --env-file .env up --build --detach
+            sudo docker-compose --env-file .env up --build --detach pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 30
