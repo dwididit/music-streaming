@@ -22,14 +22,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Move requirements.txt if necessary
-        run: |
-          if [ -f "app/requirements.txt" ]; then
-            mv app/requirements.txt requirements.txt
-          fi
-
       - name: Build and Push Docker Image
         run: |
           TAG=${GITHUB_REF##*/}
           docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 --push --file ./app/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:${TAG} --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest .
+          docker buildx build --platform linux/amd64,linux/arm64 --push --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:${TAG} --tag ${{ secrets.DOCKERHUB_USERNAME }}/pacmusic:latest .
