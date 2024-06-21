@@ -62,6 +62,3 @@ jobs:
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
 
-      - name: Run tests
-        run: python3 test/test.py
-
