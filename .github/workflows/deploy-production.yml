@@ -48,7 +48,7 @@ jobs:
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
             cat .env
-            sudo docker-compose --env-file .env pull pacmusic-prod --platform linux/amd64
+            sudo docker-compose --env-file .env pull pacmusic-prod
             sudo docker-compose --env-file .env up --detach pacmusic-prod
             sudo docker-compose --env-file .env logs pacmusic-prod
 
