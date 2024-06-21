@@ -32,11 +32,11 @@ jobs:
           echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
           echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
           echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
-#          echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+          echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
           echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
           echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
           echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-#          echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+          echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
           echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
           echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
 
