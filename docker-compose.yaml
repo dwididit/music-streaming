@@ -1,6 +1,8 @@
+version: '3'
+
 services:
 
-# DEV
+  # DEV
   pacmusic-dev:
     build:
       context: ./app
@@ -15,7 +17,7 @@ services:
     networks:
       - pacmusic-network
 
-# STG
+  # STG
   pacmusic-stg:
     build:
       context: ./app
@@ -30,7 +32,7 @@ services:
     networks:
       - pacmusic-network
 
-# PROD
+  # PROD
   pacmusic-prod:
     image: "${APP_IMAGE}:${APP_TAG}"
     container_name: pacmusic-prod
