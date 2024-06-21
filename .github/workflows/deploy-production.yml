@@ -20,12 +20,20 @@ jobs:
 
       - name: Ensure correct file structure for Docker build
         run: |
+          # Create the app directory
           mkdir -p app
-          if [ -f "requirements.txt" ]; then
-            cp requirements.txt app/
-          fi
+          # Copy app.py and requirements.txt to the app directory if they exist
           if [ -f "app.py" ]; then
             cp app.py app/
+          else
+            echo "app.py not found!"
+            exit 1
+          fi
+          if [ -f "requirements.txt" ]; then
+            cp requirements.txt app/
+          else
+            echo "requirements.txt not found!"
+            exit 1
           fi
 
       - name: Build Docker image
