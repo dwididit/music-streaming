@@ -29,6 +29,7 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_PRODUCTION }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
           script: |
+            set -e
             APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
@@ -46,7 +47,10 @@ jobs:
             echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
+            cat .env
+            sudo docker-compose --env-file .env pull pacmusic-prod
             sudo docker-compose --env-file .env up --detach pacmusic-prod
+            sudo docker-compose --env-file .env logs pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 30
