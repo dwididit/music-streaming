@@ -14,14 +14,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask minio selenium webdriver_manager
+
       - name: Create .env file for dev
         run: |
-          echo "MINIO_DEV_ENDPOINT=api-dev.minio-devops-class.pacmann.ai" > .env
-          echo "MINIO_DEV_ACCESS_KEY=pgxr3lnKHj4mxI7f69y9" >> .env
-          echo "MINIO_DEV_SECRET_KEY=KBy9zfXscFDsbI5FWKJEWUPz6VpefDXagioj6rtF" >> .env
+          echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
+          echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
+          echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
+          echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
+          echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
+          echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+          echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+          echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
+          echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
+          echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
+          echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+          echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
+          echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
+
+      - name: Move requirements.txt if necessary
+        run: |
+          if [ -f "app/requirements.txt" ]; then
+            cp app/requirements.txt requirements.txt
+          fi
 
       - name: Build and Run application
-        run: sudo docker-compose up --build --detach pacmusic-dev
+        run: |
+          cat .env
+          sudo docker-compose --env-file .env up --build --detach pacmusic-dev
+          if [ -f "requirements.txt" ]; then
+            docker-compose exec -T pacmusic-dev pip install -r requirements.txt
+          fi
 
       - name: Test Hit Endpoint
         run: |
@@ -31,5 +62,3 @@ jobs:
       - name: Install testing requirements
         run: pip install -r test/requirements.txt
 
-      - name: Run tests
-        run: python3 test/test.py

@@ -19,6 +19,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
+      - name: Move requirements.txt if necessary
+        run: |
+          if [ -f "app/requirements.txt" ]; then
+            mv app/requirements.txt requirements.txt
+          fi
+
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
@@ -41,7 +47,7 @@ jobs:
             echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
             echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
-            sudo docker-compose up --build --detach pacmusic-stg
+            sudo docker-compose --env-file .env up --build --detach pacmusic-stg
 
       - name: Wait for the application to start
         run: sleep 10
