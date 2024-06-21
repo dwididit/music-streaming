@@ -48,17 +48,12 @@ jobs:
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
             cat .env
-            sudo docker-compose --env-file .env pull pacmusic-prod --platform linux/amd64
+            sudo docker-compose --env-file .env pull pacmusic-prod
             sudo docker-compose --env-file .env up --detach pacmusic-prod
             sudo docker-compose --env-file .env logs pacmusic-prod
 
       - name: Wait for the application to start
         run: sleep 30
-
-      - name: Get Docker logs
-        run: |
-          sudo docker ps -a
-          sudo docker logs pacmusic-prod
 
       - name: Test Hit Endpoint
         run: curl -f ${{ secrets.PROD_URL }}
