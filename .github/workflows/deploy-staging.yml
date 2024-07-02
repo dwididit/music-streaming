@@ -46,6 +46,9 @@ jobs:
       - name: Check Docker Service Status After Restart
         run: systemctl status docker.service
 
+      - name: Get Docker Service Logs
+        run: journalctl -xeu docker.service
+
       - name: Clean up Docker system before build
         run: docker system prune -af --volumes
 
