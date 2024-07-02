@@ -20,7 +20,15 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
       - name: Clean up Docker system
-        run: docker system prune -af
+        run: docker system prune -af --volumes
+
+      - name: Remove unused Docker images
+        run: |
+          docker images -q | xargs docker rmi -f || true
+
+      - name: Remove unused Docker containers
+        run: |
+          docker ps -a -q | xargs docker rm -f || true
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
