@@ -21,11 +21,11 @@ jobs:
       - name: Clean up Docker system
         run: docker system prune -af --volumes
 
-      - name: Remove unused Docker images
+      - name: Clean up unused Docker images
         run: |
           docker images -q | xargs docker rmi -f || true
 
-      - name: Remove unused Docker containers
+      - name: Clean up unused Docker containers
         run: |
           docker ps -a -q | xargs docker rm -f || true
 
