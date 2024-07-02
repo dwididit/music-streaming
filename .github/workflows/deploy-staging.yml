@@ -19,12 +19,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Move requirements.txt if necessary
-        run: |
-          if [ -f "app/requirements.txt" ]; then
-            mv app/requirements.txt requirements.txt
-          fi
-
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
@@ -32,6 +26,7 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME_STAGING }}
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
+            set -e
             APP_STG_PATH="/home/ubuntu/staging"
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
@@ -43,14 +38,16 @@ jobs:
               cd $APP_STG_PATH
             fi
             touch .env
-            echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
             echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
             echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
-            sudo docker-compose --env-file .env up --build --detach pacmusic-stg
+            echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
+            echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
+            sudo docker-compose --env-file .env up --build --detach pacmusic-stg-1 pacmusic-stg-2
 
       - name: Wait for the application to start
         run: sleep 10
 
       - name: Test Hit Endpoint
-        run: curl -f ${{ secrets.STG_URL }}
+        run: curl -f ${{ secrets.STG_URL_1 }}
+        run: curl -f ${{ secrets.STG_URL_2 }}

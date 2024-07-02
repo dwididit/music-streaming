@@ -41,19 +41,21 @@ jobs:
               cd $APP_PROD_PATH
             fi
             touch .env
-            echo "MINIO_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
-            echo "MINIO_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
-            echo "MINIO_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-            echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+            echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
+            echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
+            echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
+            echo "APP_PROD_PORT_1=${{ secrets.APP_PROD_PORT_1 }}" >> .env
+            echo "APP_PROD_PORT_2=${{ secrets.APP_PROD_PORT_2 }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
             cat .env
-            sudo docker-compose --env-file .env pull pacmusic-prod
-            sudo docker-compose --env-file .env up --detach pacmusic-prod
-            sudo docker-compose --env-file .env logs pacmusic-prod
+            sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env logs pacmusic-prod-1 pacmusic-prod-2
 
       - name: Wait for the application to start
         run: sleep 30
 
       - name: Test Hit Endpoint
-        run: curl -f ${{ secrets.PROD_URL }}
+        run: curl -f ${{ secrets.PROD_URL_1 }}
+        run: curl -f ${{ secrets.PROD_URL_2 }}
