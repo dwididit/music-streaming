@@ -18,16 +18,20 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
 
-      - name: Clean up Docker system
+      - name: Clean up Docker system before build
         run: docker system prune -af --volumes
 
-      - name: Clean up unused Docker images
-        run: |
-          docker images -q | xargs docker rmi -f || true
+      - name: Remove all stopped containers
+        run: docker container prune -f
 
-      - name: Clean up unused Docker containers
-        run: |
-          docker ps -a -q | xargs docker rm -f || true
+      - name: Remove all unused images
+        run: docker image prune -af
+
+      - name: Remove all unused volumes
+        run: docker volume prune -f
+
+      - name: Remove all unused networks
+        run: docker network prune -f
 
       - name: Extract Tag
         id: extract_tag
