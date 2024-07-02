@@ -25,6 +25,9 @@ jobs:
       - name: Check Inodes
         run: df -i
 
+      - name: Check Docker Storage Driver
+        run: docker info | grep -i 'storage driver'
+
       - name: Clean up Docker system before build
         run: docker system prune -af --volumes
 
