@@ -57,5 +57,6 @@ jobs:
         run: sleep 30
 
       - name: Test Hit Endpoint
-        run: curl -f ${{ secrets.PROD_URL_1 }}
-        run: curl -f ${{ secrets.PROD_URL_2 }}
+        run: |
+          curl -f ${{ secrets.PROD_URL_1 }}
+          curl -f ${{ secrets.PROD_URL_2 }}
