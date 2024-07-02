@@ -43,6 +43,12 @@ jobs:
       - name: Remove all unused networks
         run: docker network prune -f
 
+      - name: Clean Docker Directories
+        run: |
+          sudo rm -rf /var/lib/docker/tmp
+          sudo rm -rf /var/lib/docker/containers
+          sudo rm -rf /var/lib/docker/image
+
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
