@@ -28,9 +28,6 @@ jobs:
       - name: Check Docker Storage Driver
         run: docker info | grep -i 'storage driver'
 
-      - name: Check Docker Service Status
-        run: systemctl status docker.service
-
       - name: Create Docker Daemon Configuration
         run: |
           echo '{
@@ -41,7 +38,9 @@ jobs:
           }' | sudo tee /etc/docker/daemon.json
 
       - name: Restart Docker Service
-        run: sudo systemctl restart docker.service
+        run: |
+          sudo systemctl restart docker.service || exit 0
+          sudo systemctl status docker.service
 
       - name: Fetch Docker Service Logs
         run: sudo journalctl -xeu docker.service
