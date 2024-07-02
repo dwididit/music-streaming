@@ -19,6 +19,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
+      - name: Clean up Docker system
+        run: docker system prune -af
+
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:

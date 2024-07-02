@@ -18,6 +18,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
 
+      - name: Clean up Docker system
+        run: docker system prune -af
+
       - name: Extract Tag
         id: extract_tag
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
