@@ -27,6 +27,9 @@ jobs:
       - name: Check Docker Storage Driver
         run: docker info | grep -i 'storage driver'
 
+      - name: Check Docker Service Status
+        run: systemctl status docker.service
+
       - name: Create Docker Daemon Configuration
         run: |
           echo '{
@@ -35,7 +38,12 @@ jobs:
               "overlay2.override_kernel_check=true"
             ]
           }' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
+
+      - name: Restart Docker Service
+        run: sudo systemctl restart docker.service
+
+      - name: Check Docker Service Status After Restart
+        run: systemctl status docker.service
 
       - name: Clean up Docker system before build
         run: docker system prune -af --volumes
@@ -87,7 +95,7 @@ jobs:
             echo "APP_PROD_PORT_1=${{ secrets.APP_PROD_PORT_1 }}" >> .env
             echo "APP_PROD_PORT_2=${{ secrets.APP_PROD_PORT_2 }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
-            echo "APP_TAG=${{ env.TAG }}" >> .env
+            echo "APP_TAG=${{ env.TAG }}" >> ..env
             cat .env
             sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
             sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
