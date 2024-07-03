@@ -58,5 +58,5 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          curl -f ${{ secrets.PROD_URL_1 }}
-          curl -f ${{ secrets.PROD_URL_2 }}
+          curl -f ${{ secrets.PROD_URL_1 }}:${{ secrets.APP_PROD_PORT_1 }}
+          curl -f ${{ secrets.PROD_URL_1 }}:${{ secrets.APP_PROD_PORT_2 }}
