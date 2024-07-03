@@ -29,6 +29,22 @@ jobs:
           echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" > .env
           echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
           echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
+          echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
+          echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
+          echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
+          echo "APP_STG_PORT=${{ secrets.APP_STG_PORT }}" >> .env
+          echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
+          echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
+          echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
+          echo "APP_PROD_PORT=${{ secrets.APP_PROD_PORT }}" >> .env
+          echo "APP_IMAGE=${{ secrets.APP_IMAGE }}" >> .env
+          echo "APP_TAG=${{ secrets.APP_TAG }}" >> .env
+
+      - name: Move requirements.txt if necessary
+        run: |
+          if [ -f "app/requirements.txt" ]; then
+            cp app/requirements.txt requirements.txt
+          fi
 
       - name: Build and Run application
         run: |
