@@ -60,3 +60,10 @@ jobs:
         run: |
           curl -f "${{ secrets.PROD_URL }}:${{ secrets.APP_PROD_PORT_1 }}"
           curl -f "${{ secrets.PROD_URL }}:${{ secrets.APP_PROD_PORT_2 }}"
+
+      - name: Debug Secrets
+        run: |
+          echo "PROD_URL: ${{ secrets.PROD_URL }}"
+          echo "APP_PROD_PORT_1: ${{ secrets.APP_PROD_PORT_1 }}"
+          echo "APP_PROD_PORT_2: ${{ secrets.APP_PROD_PORT_2 }}"
+
