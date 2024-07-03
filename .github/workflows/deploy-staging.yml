@@ -19,55 +19,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Check Disk Space
-        run: df -h
-
-      - name: Check Inodes
-        run: df -i
-
-      - name: Check Docker Storage Driver
-        run: docker info | grep -i 'storage driver'
-
-      - name: Create Docker Daemon Configuration
-        run: |
-          echo '{
-            "storage-driver": "overlay2",
-            "storage-opts": [
-              "overlay2.override_kernel_check=true"
-            ]
-          }' | sudo tee /etc/docker/daemon.json
-
-      - name: Restart Docker Service
-        run: |
-          sudo systemctl restart docker.service || exit 0
-
-      - name: Check Docker Service Status
-        run: systemctl status docker.service
-
-      - name: Fetch Docker Service Logs
-        run: sudo journalctl -xeu docker.service
-
-      - name: Clean up Docker system before build
-        run: docker system prune -af --volumes || exit 0
-
-      - name: Remove all stopped containers
-        run: docker container prune -f || exit 0
-
-      - name: Remove all unused images
-        run: docker image prune -af || exit 0
-
-      - name: Remove all unused volumes
-        run: docker volume prune -f || exit 0
-
-      - name: Remove all unused networks
-        run: docker network prune -f || exit 0
-
-      - name: Clean Docker Directories
-        run: |
-          sudo rm -rf /var/lib/docker/tmp || exit 0
-          sudo rm -rf /var/lib/docker/containers || exit 0
-          sudo rm -rf /var/lib/docker/image || exit 0
-
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:

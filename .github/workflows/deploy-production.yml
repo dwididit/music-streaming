@@ -18,54 +18,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}
 
-      - name: Check Disk Space
-        run: df -h
-
-      - name: Check Inodes
-        run: df -i
-
-      - name: Check Docker Storage Driver
-        run: docker info | grep -i 'storage driver'
-
-      - name: Check Docker Service Status
-        run: systemctl status docker.service
-
-      - name: Create Docker Daemon Configuration
-        run: |
-          echo '{
-            "storage-driver": "overlay2",
-            "storage-opts": [
-              "overlay2.override_kernel_check=true"
-            ]
-          }' | sudo tee /etc/docker/daemon.json
-
-      - name: Restart Docker Service
-        run: sudo systemctl restart docker.service
-
-      - name: Check Docker Service Status After Restart
-        run: systemctl status docker.service
-
-      - name: Clean up Docker system before build
-        run: docker system prune -af --volumes
-
-      - name: Remove all stopped containers
-        run: docker container prune -f
-
-      - name: Remove all unused images
-        run: docker image prune -af
-
-      - name: Remove all unused volumes
-        run: docker volume prune -f
-
-      - name: Remove all unused networks
-        run: docker network prune -f
-
-      - name: Clean Docker Directories
-        run: |
-          sudo rm -rf /var/lib/docker/tmp
-          sudo rm -rf /var/lib/docker/containers
-          sudo rm -rf /var/lib/docker/image
-
       - name: Extract Tag
         id: extract_tag
         run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
@@ -95,7 +47,7 @@ jobs:
             echo "APP_PROD_PORT_1=${{ secrets.APP_PROD_PORT_1 }}" >> .env
             echo "APP_PROD_PORT_2=${{ secrets.APP_PROD_PORT_2 }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
-            echo "APP_TAG=${{ env.TAG }}" >> ..env
+            echo "APP_TAG=${{ env.TAG }}" >> .env
             cat .env
             sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
             sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
