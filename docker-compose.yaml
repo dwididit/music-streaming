@@ -27,7 +27,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_STG_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STG_SECRET_KEY}
     ports:
-      - ${APP_STG_PORT_1}:5000
+      - ${APP_STG_PORT_1:-5002}:5000
     networks:
       - pacmusic-network
 
@@ -41,7 +41,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_STG_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STG_SECRET_KEY}
     ports:
-      - ${APP_STG_PORT_2}:5000
+      - ${APP_STG_PORT_2:-5003}:5000
     networks:
       - pacmusic-network
 
