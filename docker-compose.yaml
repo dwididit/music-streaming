@@ -44,7 +44,7 @@ services:
       - pacmusic-network
 
   pacmusic-prod-1:
-    image: "${APP_IMAGE}:${APP_TAG}"
+    image: "${APP_IMAGE:-default-image}:${APP_TAG:-latest}"
     container_name: pacmusic-prod-1
     environment:
       MINIO_ENDPOINT: ${MINIO_PROD_ENDPOINT}
@@ -56,7 +56,7 @@ services:
       - pacmusic-network
 
   pacmusic-prod-2:
-    image: "${APP_IMAGE}:${APP_TAG}"
+    image: "${APP_IMAGE:-default-image}:${APP_TAG:-latest}"
     container_name: pacmusic-prod-2
     environment:
       MINIO_ENDPOINT: ${MINIO_PROD_ENDPOINT}
