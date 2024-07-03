@@ -50,5 +50,5 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          curl -f ${{ secrets.STG_URL_1 }}:${{ secrets.APP_STG_PORT_1 }}
-          curl -f ${{ secrets.STG_URL_1 }}:${{ secrets.APP_STG_PORT_2 }}
+          curl -f ${{ secrets.STG_URL }}:${{ secrets.APP_STG_PORT_1 }}
+          curl -f ${{ secrets.STG_URL }}:${{ secrets.APP_STG_PORT_2 }}
