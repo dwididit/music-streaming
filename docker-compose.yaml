@@ -1,6 +1,7 @@
-version: '3'
+version: '3.8'
 
 services:
+  # DEV
   pacmusic-dev:
     build:
       context: ./app
@@ -15,6 +16,7 @@ services:
     networks:
       - pacmusic-network
 
+  # STG
   pacmusic-stg-1:
     build:
       context: ./app
@@ -25,7 +27,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_STG_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STG_SECRET_KEY}
     ports:
-      - ${APP_STG_PORT_1:-5002}:5000
+      - ${APP_STG_PORT_1}:5000
     networks:
       - pacmusic-network
 
@@ -39,10 +41,11 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_STG_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STG_SECRET_KEY}
     ports:
-      - ${APP_STG_PORT_2:-5003}:5000
+      - ${APP_STG_PORT_2}:5000
     networks:
       - pacmusic-network
 
+  # PROD
   pacmusic-prod-1:
     image: "${APP_IMAGE}:${APP_TAG}"
     container_name: pacmusic-prod-1
@@ -51,7 +54,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_PROD_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_PROD_SECRET_KEY}
     ports:
-      - ${APP_PROD_PORT_1:-5000}:5000
+      - ${APP_PROD_PORT_1}:5000
     networks:
       - pacmusic-network
 
@@ -63,13 +66,14 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_PROD_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_PROD_SECRET_KEY}
     ports:
-      - ${APP_PROD_PORT_2:-5001}:5000
+      - ${APP_PROD_PORT_2}:5000
     networks:
       - pacmusic-network
 
+  # NGINX Load Balancer
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: nginx-loadbalancer
     ports:
       - 80:80
       - 443:443
@@ -97,7 +101,6 @@ services:
 networks:
   pacmusic-network:
     driver: bridge
-    name: pacmusic-network
 
 volumes:
   certs:
