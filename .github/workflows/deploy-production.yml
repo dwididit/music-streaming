@@ -33,7 +33,7 @@ jobs:
             APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 || true
+              sudo docker-compose -p production down --remove-orphans --timeout 60 || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -56,10 +56,9 @@ jobs:
             echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
             echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
             cat .env
-            sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
-            sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
-            sudo docker-compose --env-file .env up --detach nginx
-            sudo docker-compose --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx
+            sudo docker-compose -p production --env-file .env pull pacmusic-prod-1 pacmusic-prod-2 nginx
+            sudo docker-compose -p production --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2 nginx
+            sudo docker-compose -p production --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx || true
 
       - name: Wait for the application to start
         run: sleep 30
