@@ -33,7 +33,7 @@ jobs:
             APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker-compose -p production down --remove-orphans --timeout 60 || true
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -48,14 +48,10 @@ jobs:
             echo "APP_PROD_PORT_2=${{ secrets.APP_PROD_PORT_2 }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
-            echo "PROD_URL=${{ secrets.PROD_URL }}" >> .env
             cat .env
-            # Stop and remove only production containers to avoid conflicts
-            sudo docker stop pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
-            sudo docker rm pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
-            sudo docker-compose -p production --env-file .env pull pacmusic-prod-1 pacmusic-prod-2 nginx
-            sudo docker-compose -p production --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2 nginx
-            sudo docker-compose -p production --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
+            sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env logs pacmusic-prod-1 pacmusic-prod-2
 
       - name: Wait for the application to start
         run: sleep 30
@@ -70,6 +66,4 @@ jobs:
           echo "PROD_URL: ${{ secrets.PROD_URL }}"
           echo "APP_PROD_PORT_1: ${{ secrets.APP_PROD_PORT_1 }}"
           echo "APP_PROD_PORT_2: ${{ secrets.APP_PROD_PORT_2 }}"
-          echo "STG_URL: ${{ secrets.STG_URL }}"
-          echo "APP_STG_PORT_1: ${{ secrets.APP_STG_PORT_1 }}"
-          echo "APP_STG_PORT_2: ${{ secrets.APP_STG_PORT_2 }}"
+

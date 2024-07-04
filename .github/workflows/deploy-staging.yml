@@ -19,10 +19,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Extract Tag
-        id: extract_tag
-        run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
@@ -34,7 +30,7 @@ jobs:
             APP_STG_PATH="/home/ubuntu/staging"
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 || true
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-stg || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -47,36 +43,12 @@ jobs:
             echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
             echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
             echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
-            echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
-            echo "APP_TAG=latest" >> .env
-            echo "STG_URL=${{ secrets.STG_URL }}" >> .env
-            echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" >> .env
-            echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
-            echo "MINIO_DEV_SECRET_KEY=${{ secrets.MINIO_DEV_SECRET_KEY }}" >> .env
-            echo "APP_DEV_PORT=${{ secrets.APP_DEV_PORT }}" >> .env
-            echo "MINIO_PROD_ENDPOINT=${{ secrets.MINIO_PROD_ENDPOINT }}" >> .env
-            echo "MINIO_PROD_ACCESS_KEY=${{ secrets.MINIO_PROD_ACCESS_KEY }}" >> .env
-            echo "MINIO_PROD_SECRET_KEY=${{ secrets.MINIO_PROD_SECRET_KEY }}" >> .env
-            echo "APP_PROD_PORT_1=${{ secrets.APP_PROD_PORT_1 }}" >> .env
-            echo "APP_PROD_PORT_2=${{ secrets.APP_PROD_PORT_2 }}" >> .env
-            cat .env
             sudo docker-compose --env-file .env up --build --detach pacmusic-stg-1 pacmusic-stg-2
-            sudo docker-compose --env-file .env up --detach nginx
-            sudo docker-compose --env-file .env logs pacmusic-stg-1 pacmusic-stg-2 nginx
 
       - name: Wait for the application to start
-        run: sleep 30
+        run: sleep 10
 
       - name: Test Hit Endpoint
         run: |
           curl -f "${{ secrets.STG_URL }}:${{ secrets.APP_STG_PORT_1 }}"
           curl -f "${{ secrets.STG_URL }}:${{ secrets.APP_STG_PORT_2 }}"
-
-      - name: Debug Secrets
-        run: |
-          echo "STG_URL: ${{ secrets.STG_URL }}"
-          echo "APP_STG_PORT_1: ${{ secrets.APP_STG_PORT_1 }}"
-          echo "APP_STG_PORT_2: ${{ secrets.APP_STG_PORT_2 }}"
-          echo "MINIO_STG_ENDPOINT: ${{ secrets.MINIO_STG_ENDPOINT }}"
-          echo "MINIO_STG_ACCESS_KEY: ${{ secrets.MINIO_STG_ACCESS_KEY }}"
-          echo "MINIO_STG_SECRET_KEY: ${{ secrets.MINIO_STG_SECRET_KEY }}"
