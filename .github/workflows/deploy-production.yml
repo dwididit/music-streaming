@@ -49,16 +49,10 @@ jobs:
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
             echo "PROD_URL=${{ secrets.PROD_URL }}" >> .env
-            echo "STG_URL=${{ secrets.STG_URL }}" >> .env
-            echo "MINIO_STG_ENDPOINT=${{ secrets.MINIO_STG_ENDPOINT }}" >> .env
-            echo "MINIO_STG_ACCESS_KEY=${{ secrets.MINIO_STG_ACCESS_KEY }}" >> .env
-            echo "MINIO_STG_SECRET_KEY=${{ secrets.MINIO_STG_SECRET_KEY }}" >> .env
-            echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
-            echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
             cat .env
-            # Stop and remove existing containers to avoid conflicts
-            sudo docker stop pacmusic-prod-1 pacmusic-prod-2 pacmusic-stg-1 pacmusic-stg-2 nginx-loadbalancer || true
-            sudo docker rm pacmusic-prod-1 pacmusic-prod-2 pacmusic-stg-1 pacmusic-stg-2 nginx-loadbalancer || true
+            # Stop and remove only production containers to avoid conflicts
+            sudo docker stop pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
+            sudo docker rm pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
             sudo docker-compose -p production --env-file .env pull pacmusic-prod-1 pacmusic-prod-2 nginx
             sudo docker-compose -p production --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2 nginx
             sudo docker-compose -p production --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
