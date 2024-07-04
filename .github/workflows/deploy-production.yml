@@ -56,9 +56,12 @@ jobs:
             echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
             echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
             cat .env
+            # Stop and remove existing containers to avoid conflicts
+            sudo docker stop pacmusic-prod-1 pacmusic-prod-2 pacmusic-stg-1 pacmusic-stg-2 nginx-loadbalancer || true
+            sudo docker rm pacmusic-prod-1 pacmusic-prod-2 pacmusic-stg-1 pacmusic-stg-2 nginx-loadbalancer || true
             sudo docker-compose -p production --env-file .env pull pacmusic-prod-1 pacmusic-prod-2 nginx
             sudo docker-compose -p production --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2 nginx
-            sudo docker-compose -p production --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx || true
+            sudo docker-compose -p production --env-file .env logs pacmusic-prod-1 pacmusic-prod-2 nginx-loadbalancer || true
 
       - name: Wait for the application to start
         run: sleep 30
