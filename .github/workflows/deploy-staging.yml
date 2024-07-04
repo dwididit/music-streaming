@@ -48,7 +48,7 @@ jobs:
             echo "APP_STG_PORT_1=${{ secrets.APP_STG_PORT_1 }}" >> .env
             echo "APP_STG_PORT_2=${{ secrets.APP_STG_PORT_2 }}" >> .env
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
-            echo "APP_TAG=${{ env.TAG }}" >> .env
+            echo "APP_TAG=latest" >> .env
             echo "STG_URL=${{ secrets.STG_URL }}" >> .env
             echo "MINIO_DEV_ENDPOINT=${{ secrets.MINIO_DEV_ENDPOINT }}" >> .env
             echo "MINIO_DEV_ACCESS_KEY=${{ secrets.MINIO_DEV_ACCESS_KEY }}" >> .env
