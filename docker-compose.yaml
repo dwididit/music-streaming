@@ -84,8 +84,6 @@ services:
     depends_on:
       - pacmusic-stg-1
       - pacmusic-stg-2
-      - pacmusic-prod-1
-      - pacmusic-prod-2
     networks:
       - pacmusic-network
 
