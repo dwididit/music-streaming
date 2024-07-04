@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   # DEV
@@ -92,6 +92,7 @@ services:
   certbot:
     image: certbot/certbot
     container_name: certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email didit@dwidi.dev --agree-tos --no-eff-email --force-renewal -d stg.dwidi.xyz -d dwidi.xyz
     volumes:
       - certs:/etc/letsencrypt
       - /var/www/certbot:/var/www/certbot
