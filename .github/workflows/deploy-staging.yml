@@ -31,7 +31,8 @@ jobs:
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
-              sudo docker rm -f pacmusic-stg-1 pacmusic-stg-2 nginx certbot || true
+              sudo docker stop pacmusic-prod-2 || true
+              sudo docker rm -f pacmusic-prod-2 || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
