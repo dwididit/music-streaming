@@ -33,7 +33,8 @@ jobs:
             APP_PROD_PATH="/home/ubuntu/production"
             if [ -d "$APP_PROD_PATH" ]; then
               cd $APP_PROD_PATH
-              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod || true
+              sudo docker-compose down --remove-orphans --timeout 60 pacmusic-prod-1 pacmusic-prod-2 || true
+              sudo docker rm -f pacmusic-prod-1 pacmusic-prod-2 || true
               git pull origin main
             else
               ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -66,4 +67,3 @@ jobs:
           echo "PROD_URL: ${{ secrets.PROD_URL }}"
           echo "APP_PROD_PORT_1: ${{ secrets.APP_PROD_PORT_1 }}"
           echo "APP_PROD_PORT_2: ${{ secrets.APP_PROD_PORT_2 }}"
-
