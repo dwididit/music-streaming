@@ -50,9 +50,9 @@ jobs:
             echo "APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pacmusic" >> .env
             echo "APP_TAG=${{ env.TAG }}" >> .env
             cat .env
-            sudo docker-compose --env-file .env build nginx
-            sudo docker-compose --env-file .env up --detach nginx
-            sudo docker-compose --env-file .env logs nginx 
+            sudo docker-compose --env-file .env pull pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env up --detach pacmusic-prod-1 pacmusic-prod-2
+            sudo docker-compose --env-file .env logs pacmusic-prod-1 pacmusic-prod-2
 
       - name: Wait for the application to start
         run: sleep 30
