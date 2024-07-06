@@ -19,6 +19,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
+      - name: Test SSH Connection to Server
+        run: ssh -o StrictHostKeyChecking=no -T ${{ secrets.SSH_USER_NAME_STAGING }}@${{ secrets.SSH_HOST_STAGING }} || exit 1
+
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
